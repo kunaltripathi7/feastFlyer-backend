@@ -20,7 +20,7 @@ const createCurrentUser = async (req: Request, res: Response) => {
     const { auth0Id } = req.body;
     const existingUser = await User.findOne({ auth0Id });
     if (existingUser) {
-      res.status(200).send();
+      return res.status(200).send();
     }
     const newUser = new User(req.body);
     await newUser.save();
