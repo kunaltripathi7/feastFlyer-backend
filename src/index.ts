@@ -4,6 +4,7 @@ import "dotenv/config";
 import mongoose from "mongoose";
 import myUserRoute from "./routes/MyUserRoute";
 import myRestaurantRoute from "./routes/MyRestaurantRoute";
+import RestaurantRoute from "./routes/RestaurantRoute";
 import { v2 as cloudinary } from "cloudinary";
 
 mongoose
@@ -27,6 +28,7 @@ app.get("/health", async (req: Request, res: Response) => {
 
 app.use("/api/my/user", myUserRoute); // convention to include my for logged in user
 app.use("/api/my/restaurant", myRestaurantRoute);
+app.use("/api/restaurant", RestaurantRoute);
 
 app.get("/test", async (req: Request, res: Response) => {
   res.json({ message: "Hello" });
