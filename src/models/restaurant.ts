@@ -1,9 +1,17 @@
-import mongoose from "mongoose";
+import mongoose, { InferSchemaType } from "mongoose";
 
 const menuItemSchema = new mongoose.Schema({
+  _id: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    default: () => new mongoose.Types.ObjectId(),
+  }, // defining to access id on type || if you defined in schema then it will implicity req the id, so default case();
   name: { type: String, required: true },
   price: { type: Number, required: true },
 });
+
+// works for embedded schemas but for export menuItem type, creating just for accessibility
+export type menuItem = InferSchemaType<typeof menuItemSchema>;
 
 const restaurantSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
