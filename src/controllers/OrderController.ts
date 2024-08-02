@@ -2,11 +2,25 @@ import { Request, Response } from "express";
 import Stripe from "stripe";
 import Restaurant, { menuItem as MenuItemType } from "../models/restaurant";
 import Order from "../models/order";
-import User from "../models/user";
 
 const STRIPE = new Stripe(process.env.STRIPE_API_KEY as string);
 const FRONTEND_URL = process.env.FRONTEND_URL as string;
 const STRIPE_ENDPOINT_SECRET = process.env.STRIPE_ENDPOINT_SECRET as string;
+
+const getMyOrders = async (req: Request, res: Response) => {
+  try {
+    const orders = await Order.find({ user: req.userId })
+      .populate("restaurant")
+      .populate("user");
+    if (!orders) {
+      throw new Error("Order not found");
+    }
+    res.json(orders);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Order not found" });
+  }
+};
 
 export type CheckoutSessionRequest = {
   cartItems: {
@@ -156,4 +170,4 @@ const stripeWebhookHandler = async (req: Request, res: Response) => {
   res.status(200).send();
 };
 
-export default { createCheckoutSession, stripeWebhookHandler };
+export default { createCheckoutSession, stripeWebhookHandler, getMyOrders };

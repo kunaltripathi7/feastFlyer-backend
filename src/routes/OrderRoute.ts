@@ -1,8 +1,9 @@
 import { Router } from "express";
 import OrderController from "../controllers/OrderController";
 import { jwtCheck, jwtParse } from "../middleware/auth";
-
 const router = Router();
+
+router.get("/", jwtCheck, jwtParse, OrderController.getMyOrders);
 
 router.post(
   "/checkout/create-checkout-session",

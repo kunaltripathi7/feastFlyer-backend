@@ -14,6 +14,20 @@ const upload = multer({
   },
 });
 
+// when you need to update only a part of obj.
+router.patch(
+  "/order/:orderId/status",
+  jwtCheck,
+  jwtParse,
+  MyRestaurantController.updateOrderStatus
+);
+router.get(
+  "/order",
+  jwtCheck,
+  jwtParse,
+  MyRestaurantController.getMyRestaurantOrders
+);
+
 router.get("/", jwtCheck, jwtParse, MyRestaurantController.getRestaurant);
 
 router.put(
