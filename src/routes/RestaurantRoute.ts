@@ -5,6 +5,8 @@ import { jwtCheck, jwtParse } from "../middleware/auth";
 
 const router = Router();
 
+router.get("/nearby", RestaurantController.searchNearMe);
+
 router.get(
   "/:restaurantId",
   param("restaurantId")

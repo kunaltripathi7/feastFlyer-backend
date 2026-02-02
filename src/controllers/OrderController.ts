@@ -158,10 +158,19 @@ const stripeWebhookHandler = async (req: Request, res: Response) => {
     return res.status(400).json({ message: `Webhook error ${error.message}` });
   }
   if (event.type === "checkout.session.completed") {
+    const sessionId = event.data.object.id;
+
+    const existingOrder = await Order.findOne({ stripeSessionId: sessionId });
+    if (existingOrder && existingOrder.status === "paid") {
+      return res.status(200).send();
+    }
+
     const order = await Order.findById(event.data.object.metadata?.orderId);
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
+
+    order.stripeSessionId = sessionId;
     order.totalAmount = event.data.object.amount_total;
     order.status = "paid";
     await order.save();

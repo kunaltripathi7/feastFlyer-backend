@@ -18,6 +18,10 @@ const restaurantSchema = new mongoose.Schema({
   restaurantName: { type: String, required: true },
   city: { type: String, required: true },
   country: { type: String, required: true },
+  location: {
+    type: { type: String, enum: ["Point"], default: "Point" },
+    coordinates: { type: [Number], index: "2dsphere" } // [longitude, latitude]
+  },
   deliveryPrice: { type: Number, required: true },
   estimatedDeliveryTime: { type: Number, required: true },
   cuisines: [{ type: String, required: true }],
@@ -25,6 +29,8 @@ const restaurantSchema = new mongoose.Schema({
   imageUrl: { type: String, required: true },
   lastUpdated: { type: Date, required: true },
 });
+
+restaurantSchema.index({ location: "2dsphere", cuisines: 1 });
 
 const Restaurant = mongoose.model("Restaurant", restaurantSchema);
 export default Restaurant;

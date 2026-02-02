@@ -80,7 +80,63 @@ const getRestaurant = async (req: Request, res: Response) => {
   }
 };
 
+const searchNearMe = async (req: Request, res: Response) => {
+  try {
+    const { longitude, latitude, maxDistanceKm, selectedCuisines, page = "1" } = req.query;
+
+    if (!longitude || !latitude) {
+      return res.status(400).json({ message: "Longitude and latitude are required" });
+    }
+
+    const pageSize = 10;
+    const skip = (parseInt(page as string) - 1) * pageSize;
+    const maxDistance = parseFloat(maxDistanceKm as string) || 10;
+
+    const query: any = {
+      location: {
+        $nearSphere: {
+          $geometry: {
+            type: "Point",
+            coordinates: [parseFloat(longitude as string), parseFloat(latitude as string)]
+          },
+          $maxDistance: maxDistance * 1000
+        }
+      }
+    };
+
+    if (selectedCuisines) {
+      query.cuisines = { $all: (selectedCuisines as string).split(",") };
+    }
+
+    const restaurants = await Restaurant.find(query)
+      .skip(skip)
+      .limit(pageSize)
+      .lean();
+
+    const total = await Restaurant.countDocuments({
+      location: {
+        $geoWithin: {
+          $centerSphere: [
+            [parseFloat(longitude as string), parseFloat(latitude as string)],
+            maxDistance / 6378.1
+          ]
+        }
+      },
+      ...(selectedCuisines && { cuisines: { $all: (selectedCuisines as string).split(",") } })
+    });
+
+    res.json({
+      data: restaurants,
+      pagination: { total, page: parseInt(page as string), pages: Math.ceil(total / pageSize) }
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error searching nearby restaurants" });
+  }
+};
+
 export default {
   searchRestaurant,
   getRestaurant,
+  searchNearMe,
 };
