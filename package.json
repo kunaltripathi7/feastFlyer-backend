@@ -7,7 +7,9 @@
     "dev": "concurrently \"nodemon\" \"npm run stripe \"",
     "stripe": "stripe listen --forward-to localhost:7000/api/order/checkout/webhook",
     "build": "npm install && npx tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "seed:million": "npx ts-node src/seed-million.ts",
+    "benchmark:geo": "npx ts-node src/benchmark-geo.ts"
   },
   "author": "",
   "license": "ISC",
